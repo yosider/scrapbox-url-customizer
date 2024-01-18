@@ -1,5 +1,5 @@
-import { getTweet, RefTweet, Tweet } from "../internal/getTweet.ts";
 import { getTweetInfo, TweetInfo } from "../deps/scrapbox-rest.ts";
+import { getTweet, RefTweet, Tweet } from "../internal/getTweet.ts";
 import {
   Media,
   ProcessedTweet,
@@ -46,14 +46,14 @@ const defaultFormat = (tweet: Tweet | RefTweet | TweetInfo, url: URL) => {
   return [
     ...(replyTo
       ? [
-        ...stringify(replyTo).map((line) => ` > ${line}`),
         ...(replyTo.quote
-          ? stringify(replyTo.quote).map((line) => `  > ${line}`)
+          ? stringify(replyTo.quote).map((line) => `> ${line}`)
           : []),
+        ...stringify(replyTo).map((line) => `> ${line}`),
       ]
       : []),
     ...stringify(processed).map((line) => `> ${line}`),
-    ...(quote ? stringify(quote).map((line) => `> > ${line}`) : []),
+    ...(quote ? stringify(quote).map((line) => ` > ${line}`) : []),
   ].join("\n");
 };
 
