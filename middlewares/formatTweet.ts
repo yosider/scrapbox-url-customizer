@@ -1,5 +1,5 @@
-import { getTweet, RefTweet, Tweet } from "../internal/getTweet.ts";
 import { getTweetInfo, TweetInfo } from "../deps/scrapbox-rest.ts";
+import { getTweet, RefTweet, Tweet } from "../internal/getTweet.ts";
 import {
   Media,
   ProcessedTweet,
