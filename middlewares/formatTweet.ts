@@ -41,19 +41,11 @@ const defaultFormat = (tweet: Tweet | RefTweet | TweetInfo, url: URL) => {
     ].join("\n");
   }
 
-  const { quote, replyTo, ...processed } = processTweet(tweet);
+  const { quote, ...processed } = processTweet(tweet);
 
   return [
-    ...(replyTo
-      ? [
-        ...(replyTo.quote
-          ? stringify(replyTo.quote).map((line) => `> ${line}`)
-          : []),
-        ...stringify(replyTo).map((line) => `> ${line}`),
-      ]
-      : []),
+    ...(quote ? stringify(quote).map((line) => `> ${line}`) : []),
     ...stringify(processed).map((line) => `> ${line}`),
-    ...(quote ? stringify(quote).map((line) => ` > ${line}`) : []),
   ].join("\n");
 };
 
