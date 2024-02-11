@@ -11,26 +11,25 @@ import { convertScrapboxURL } from "./convertScrapboxURL.ts";
 export const formatTweet = (
   format: (tweet: Tweet | TweetInfo, url: URL) => string = defaultFormat,
 ): (url: URL) => Promise<string> | URL =>
-(url) => {
-  // from https://scrapbox.io/asset/index.js
-  const [, id] = url.href.match(
-    /^https:\/\/(?:(?:www\.|mobile\.|m\.)?twitter|x)\.com\/[\w\d_]+\/(?:status|statuses)\/(\d+)/,
-  ) ?? [];
-  if (!id) return url;
+  (url) => {
+    // from https://scrapbox.io/asset/index.js
+    const [, id] = url.href.match(
+      /^https:\/\/(?:(?:www\.|mobile\.|m\.)?twitter|x)\.com\/[\w\d_]+\/(?:status|statuses)\/(\d+)/,
+    ) ?? [];
+    if (!id) return url;
 
-  return (async () => {
-    const result = await (getTweet(id) ?? getTweetInfo(url.href));
-    if (!result.ok) throw result.value;
-    return format(result.value, url);
-  })();
-};
+    return (async () => {
+      const result = await (getTweet(id) ?? getTweetInfo(url.href));
+      if (!result.ok) throw result.value;
+      return format(result.value, url);
+    })();
+  };
 
 /** scrapbox.ioが使っているformatに、返信先と引用元tweetを加えたもの */
 const defaultFormat = (tweet: Tweet | RefTweet | TweetInfo, url: URL) => {
   if ("images" in tweet) {
     return [
-      `[${escapeForEmbed(tweet.screenName)}(@${
-        escapeForEmbed(tweet.userName)
+      `[${escapeForEmbed(tweet.screenName)}(@${escapeForEmbed(tweet.userName)
       }) ${url.origin}${url.pathname}]`,
       ...tweet.description.split("\n").map((line) =>
         `> ${escapeForEmbed(line)}`
@@ -41,19 +40,11 @@ const defaultFormat = (tweet: Tweet | RefTweet | TweetInfo, url: URL) => {
     ].join("\n");
   }
 
-  const { quote, replyTo, ...processed } = processTweet(tweet);
+  const { quote, ...processed } = processTweet(tweet);
 
   return [
-    ...(replyTo
-      ? [
-        ...(replyTo.quote
-          ? stringify(replyTo.quote).map((line) => `> ${line}`)
-          : []),
-        ...stringify(replyTo).map((line) => `> ${line}`),
-      ]
-      : []),
+    ...(quote ? stringify(quote).map((line) => `> ${line}`) : []),
     ...stringify(processed).map((line) => `> ${line}`),
-    ...(quote ? stringify(quote).map((line) => ` > ${line}`) : []),
   ].join("\n");
 };
 
@@ -61,8 +52,7 @@ const stringify = ({ content, author, id }: ProcessedTweet) => {
   const url = `https://twitter.com/${author.screenName}/status/${id}`;
 
   return [
-    `[${escapeForEmbed(author.name)}(@${
-      escapeForEmbed(author.screenName)
+    `[${escapeForEmbed(author.name)}(@${escapeForEmbed(author.screenName)
     }) ${url}]`,
     ...content.map((node) => {
       switch (node.type) {
@@ -93,10 +83,9 @@ const stringify = ({ content, author, id }: ProcessedTweet) => {
 };
 
 const makeEmbed = (media: Media["media"][0]) =>
-  `[${media.url}${
-    media.type === "photo"
-      ? /\.(?:png|jpe?g|gif|svg)$/.test(`${media.url}`) ? "" : "#.jpg"
-      : /\.(?:mp4|webm)$/.test(`${media.url}`)
+  `[${media.url}${media.type === "photo"
+    ? /\.(?:png|jpe?g|gif|svg)$/.test(`${media.url}`) ? "" : "#.jpg"
+    : /\.(?:mp4|webm)$/.test(`${media.url}`)
       ? ""
       : "#.mp4"
   }]`;
