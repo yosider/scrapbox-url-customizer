@@ -56,7 +56,7 @@ scrapbox.PopupMenu.addButton({
       // 文字列に違いがあるときのみ更新
       return text === promise ? undefined : promise;
     }
-    
+
     // 選択範囲に変換後の文字列を上書きする
     // 変換中に選択範囲が変わると、ずれた位置に挿入されるので注意
     promise.then((converted) => {
@@ -66,4 +66,3 @@ scrapbox.PopupMenu.addButton({
     return undefined;
   },
 });
-  
